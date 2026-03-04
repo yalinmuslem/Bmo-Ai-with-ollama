@@ -1,0 +1,36 @@
+# --- Python Environment ---
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+venv/
+env/
+
+# --- BMO Project Audio (Temporary Files) ---
+# Kita tidak ingin menyimpan file suara hasil generate setiap kali run
+temp_base.mp3
+temp_base.wav
+temp_input.mp3
+temp_input.wav
+temp_text.txt
+piper_output.wav
+bmo_final.wav
+
+# --- AI Models (Large Files) ---
+# Model .pth dan .index biasanya sangat besar (>50MB)
+# Disarankan untuk tidak di-push ke GitHub biasa (kecuali pakai Git LFS)
+models/*.pth
+models/*.index
+models/*.onnx
+models/*.json
+
+# --- External Tools ---
+# Folder piper.exe yang kita download manual
+piper/
+
+# --- IDE & OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

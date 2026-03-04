@@ -24,16 +24,20 @@ voice = PiperVoice.load(MODEL_PIPER)
 rvc = RVCInference(device="cuda:0")
 rvc.load_model(MODEL_RVC, "v2", INDEX_RVC)
 
+def sanitize_bmo_text(text):
+    # Menghapus teks di dalam tanda kurung atau tanda bintang (gestur/aksi)
+    # Contoh: "Halo! *tersenyum*" -> "Halo!"
+    text = re.sub(r'\*.*?\*', '', text)
+    text = re.sub(r'\(.*?\)', '', text)
+    
+    # Menghapus karakter Markdown lainnya (seperti # atau _)
+    text = text.replace('#', '').replace('_', '')
+    
+    # Membersihkan spasi berlebih
+    return " ".join(text.split()).strip()
+
 def bmo_speak_piper(text):
-    # 1. Hapus teks di antara tanda bintang (Action/Gestures)
-    # Contoh: "Hello *waves*" menjadi "Hello "
-    clean_text = re.sub(r'\*.*?\*', '', text)
-    
-    # 2. Hapus karakter asterik yang tersisa (jika ada)
-    clean_text = clean_text.replace('*', '')
-    
-    # 3. Normalisasi spasi ganda hasil penghapusan tadi
-    clean_text = " ".join(clean_text.split())
+    clean_text = sanitize_bmo_text(text)
 
     if not clean_text:
         return

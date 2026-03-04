@@ -77,7 +77,7 @@ def bmo_speak_piper(text, face):
 
         # 2. RVC CONVERSION
         rvc.f0up_key = 12
-        rvc.f0method = "rmvpe"
+        rvc.f0method = "pm"
         rvc.infer_file(input_wav, final_wav)
 
         # 3. PLAYBACK

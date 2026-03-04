@@ -14,7 +14,7 @@ def listen_to_user():
     r = sr.Recognizer()
     r.energy_threshold = 400 
     r.dynamic_energy_threshold = True
-    r.pause_threshold = 0.5 # Respons cepat
+    r.pause_threshold = 0.8 # Respons cepat
     
     with sr.Microphone() as source:
         face.set_state("LISTENING") # Wajah antusias mendengar

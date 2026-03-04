@@ -4,17 +4,9 @@ import pygame
 import torch
 import re                    # Tambahkan ini
 import numpy as np           # Tambahkan ini
-import threading
 from scipy.io import wavfile # Tambahkan ini
 from piper.voice import PiperVoice
 from rvc_python.infer import RVCInference
-from bmo_visual import BMOFace
-
-face = BMOFace()
-
-# 1. Jalankan Wajah di Thread Terpisah
-face_thread = threading.Thread(target=face.draw, daemon=True)
-face_thread.start()
 
 # --- BYPASS SECURITY PYTORCH ---
 import torch.serialization
@@ -46,7 +38,9 @@ def sanitize_bmo_text(text):
     # Membersihkan spasi berlebih
     return " ".join(text.split()).strip()
 
-def bmo_speak_piper(text):
+pygame.mixer.init()
+
+def bmo_speak_piper(text, face):
     clean_text = sanitize_bmo_text(text)
 
     if not clean_text:

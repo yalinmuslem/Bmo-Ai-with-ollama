@@ -1,17 +1,16 @@
 import pygame
 import random
-import threading
 import time
 
 class BMOFace:
     def __init__(self):
         pygame.init()
-        # Resolusi standar layar kecil (bisa disesuaikan)
+        # Resolusi standar layar kecil
         self.screen = pygame.display.set_mode((800, 480))
         pygame.display.set_caption("BMO Face")
-        self.bg_color = (145, 201, 171) # Teal BMO
+        self.bg_color = (145, 201, 171) 
         self.eye_color = (30, 30, 30)
-        self.state = "IDLE" # IDLE, THINKING, SPEAKING
+        self.state = "IDLE" 
         self.running = True
         self.mouth_open = 0
 
@@ -44,35 +43,37 @@ class BMOFace:
             else:
                 self._draw_eyes(closed=False)
 
-            # Logika Mulut (Lip-Sync Sederhana)
+            # Logika Mulut & Ekspresi
             if self.state == "SPEAKING":
-                # Animasi mulut buka tutup cepat
                 self.mouth_open = (self.mouth_open + 1) % 5
                 self._draw_mouth(size=self.mouth_open * 10)
+            elif self.state == "LISTENING":
+                self._draw_mouth(size=5) # Mulut sedikit terbuka saat mendengar
             else:
                 self._draw_mouth(size=0)
 
             pygame.display.flip()
-            time.sleep(0.05) # ~20 FPS cukup untuk wajah simpel
+            time.sleep(0.05)
 
     def _draw_eyes(self, closed=False):
-        if closed:
-            # Mata garis saat berkedip
+        if self.state == "LISTENING":
+            # Mata membesar saat mendengar agar terlihat antusias
+            pygame.draw.circle(self.screen, (255, 255, 255), (260, 190), 55)
+            pygame.draw.circle(self.screen, self.eye_color, (260, 190), 45)
+            pygame.draw.circle(self.screen, (255, 255, 255), (540, 190), 55)
+            pygame.draw.circle(self.screen, self.eye_color, (540, 190), 45)
+        elif closed:
             pygame.draw.rect(self.screen, self.eye_color, (220, 180, 80, 10))
             pygame.draw.rect(self.screen, self.eye_color, (500, 180, 80, 10))
         else:
-            # Mata oval normal
             pygame.draw.ellipse(self.screen, self.eye_color, (230, 140, 60, 100))
             pygame.draw.ellipse(self.screen, self.eye_color, (510, 140, 60, 100))
 
     def _draw_mouth(self, size=0):
-        if size > 0:
-            # Mulut terbuka (semakin besar size, semakin lebar)
+        if self.state == "SPEAKING":
             rect = (350, 300, 100, 20 + size)
             pygame.draw.ellipse(self.screen, self.eye_color, rect)
+        elif self.state == "THINKING":
+            pygame.draw.circle(self.screen, self.eye_color, (400, 320), 15)
         else:
-            # Mulut garis datar
-            pygame.draw.line(self.screen, self.eye_color, (360, 320), (440, 320), 8)
-
-# Inisialisasi global
-face = BMOFace()
+            pygame.draw.arc(self.screen, self.eye_color, (350, 280, 100, 40), 3.14, 0, 5)

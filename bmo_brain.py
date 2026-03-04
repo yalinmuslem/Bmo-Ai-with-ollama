@@ -37,7 +37,7 @@ def listen_to_user():
             return None
 
 def chat_with_bmo():
-    bmo_speak_piper("Halo! Aku BMO. Mau main bareng?")
+    bmo_speak_piper("Hello! I'm BMO. Want to play together?")
     
     while True:
         user_input = listen_to_user()

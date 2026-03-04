@@ -2,6 +2,7 @@ import os
 import time
 import pygame
 import torch
+import re                    # Tambahkan ini
 import numpy as np           # Tambahkan ini
 from scipy.io import wavfile # Tambahkan ini
 from piper.voice import PiperVoice
@@ -24,7 +25,22 @@ rvc = RVCInference(device="cuda:0")
 rvc.load_model(MODEL_RVC, "v2", INDEX_RVC)
 
 def bmo_speak_piper(text):
-    print(f"BMO: {text}")
+    # 1. Hapus teks di antara tanda bintang (Action/Gestures)
+    # Contoh: "Hello *waves*" menjadi "Hello "
+    clean_text = re.sub(r'\*.*?\*', '', text)
+    
+    # 2. Hapus karakter asterik yang tersisa (jika ada)
+    clean_text = clean_text.replace('*', '')
+    
+    # 3. Normalisasi spasi ganda hasil penghapusan tadi
+    clean_text = " ".join(clean_text.split())
+
+    if not clean_text:
+        return
+
+    print(f"BMO (Original): {text}")
+    print(f"BMO (Speaking): {clean_text}")
+
     input_wav = os.path.join(BASE_DIR, "piper_output.wav")
     final_wav = os.path.join(BASE_DIR, "bmo_final.wav")
 

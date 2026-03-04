@@ -4,9 +4,17 @@ import pygame
 import torch
 import re                    # Tambahkan ini
 import numpy as np           # Tambahkan ini
+import threading
 from scipy.io import wavfile # Tambahkan ini
 from piper.voice import PiperVoice
 from rvc_python.infer import RVCInference
+from bmo_visual import BMOFace
+
+face = BMOFace()
+
+# 1. Jalankan Wajah di Thread Terpisah
+face_thread = threading.Thread(target=face.draw, daemon=True)
+face_thread.start()
 
 # --- BYPASS SECURITY PYTORCH ---
 import torch.serialization
@@ -32,6 +40,8 @@ def sanitize_bmo_text(text):
     
     # Menghapus karakter Markdown lainnya (seperti # atau _)
     text = text.replace('#', '').replace('_', '')
+
+    text = re.sub(r'\bBMO\b', 'Bimo', text, flags=re.IGNORECASE)
     
     # Membersihkan spasi berlebih
     return " ".join(text.split()).strip()
@@ -77,6 +87,7 @@ def bmo_speak_piper(text):
         rvc.infer_file(input_wav, final_wav)
 
         # 3. PLAYBACK
+        face.set_state("SPEAKING")
         pygame.mixer.init()
         pygame.mixer.music.load(final_wav)
         pygame.mixer.music.play()
@@ -84,6 +95,7 @@ def bmo_speak_piper(text):
             pygame.time.Clock().tick(10)
         pygame.mixer.music.stop()
         pygame.mixer.quit()
+        face.set_state("IDLE")
 
     except Exception as e:
         print(f"BMO Error: {e}")

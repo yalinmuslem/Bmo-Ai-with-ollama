@@ -13,11 +13,12 @@ class BMOFace:
         self.state = "IDLE" 
         self.running = True
         self.mouth_open = 0
+        self.clock = pygame.time.Clock() # Tambahkan Clock
 
     def set_state(self, new_state):
         self.state = new_state
         
-    def draw(self):
+    def draw_loop(self): # <--- Pastikan namanya draw_loop
         last_blink = time.time()
         blink_duration = 0.15
         is_blinking = False
@@ -47,13 +48,13 @@ class BMOFace:
             if self.state == "SPEAKING":
                 self.mouth_open = (self.mouth_open + 1) % 5
                 self._draw_mouth(size=self.mouth_open * 10)
-            elif self.state == "LISTENING":
-                self._draw_mouth(size=5) # Mulut sedikit terbuka saat mendengar
+            elif self.state == "THINKING":
+                self._draw_mouth(size=0) # Akan digambar bulat kecil di _draw_mouth
             else:
                 self._draw_mouth(size=0)
 
             pygame.display.flip()
-            time.sleep(0.05)
+            self.clock.tick(30) # Kunci di 30 FPS agar CPU stabil
 
     def _draw_eyes(self, closed=False):
         if self.state == "LISTENING":

@@ -1,3 +1,4 @@
+import time
 import speech_recognition as sr
 import ollama
 import threading
@@ -6,7 +7,7 @@ from bmo_speak_piper import bmo_speak_piper
 
 # 1. Satu-satunya Inisialisasi Wajah
 face = BMOFace()
-face_thread = threading.Thread(target=face.draw, daemon=True)
+face_thread = threading.Thread(target=face.draw_loop, daemon=True)
 face_thread.start()
 
 def listen_to_user():
@@ -49,5 +50,47 @@ def chat_with_bmo():
             # Bicara
             bmo_speak_piper(bmo_answer, face)
 
+
+def ai_logic_thread():
+    """Fungsi ini berjalan di background agar tidak mengganggu visual"""
+    time.sleep(2) # Beri waktu Pygame untuk muncul dulu
+    bmo_speak_piper("Hello Friend! BMO is ready to play.", face)
+    
+    while True:
+        # 1. Listen
+        face.set_state("LISTENING")
+        r = sr.Recognizer()
+        r.pause_threshold = 0.5 # Sesuai keinginan Anda untuk respons cepat
+        
+        with sr.Microphone() as source:
+            try:
+                audio = r.listen(source, timeout=10)
+                face.set_state("IDLE")
+                user_input = r.recognize_google(audio, language="id-ID")
+                print(f"User: {user_input}")
+                
+                # 2. Think
+                face.set_state("THINKING")
+                response = ollama.chat(model='bmo-model', messages=[
+                    {'role': 'user', 'content': user_input},
+                ])
+                
+                # 3. Speak
+                bmo_answer = response['message']['content']
+                bmo_speak_piper(bmo_answer, face)
+                
+            except Exception as e:
+                face.set_state("IDLE")
+                continue
+                
 if __name__ == "__main__":
-    chat_with_bmo()
+    # Jalankan AI di BACKGROUND
+    brain_thread = threading.Thread(target=ai_logic_thread, daemon=True)
+    brain_thread.start()
+
+    # Jalankan VISUAL di MAIN THREAD (Ini yang bikin tidak Not Responding)
+    try:
+        face.draw_loop()
+    except KeyboardInterrupt:
+        face.running = False
+        print("BMO is shutting down...")

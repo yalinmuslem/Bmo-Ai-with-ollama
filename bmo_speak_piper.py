@@ -47,7 +47,7 @@ def bmo_speak_piper(text):
     try:
         # 1. GENERATE SUARA DENGAN PIPER (Alternatif Numpy)
         audio_data = []
-        for chunk in voice.synthesize(text):
+        for chunk in voice.synthesize(clean_text):
             # Ambil buffer mentah dari objek AudioChunk
             # print(f"Isi chunk: {dir(chunk)}")
             raw_data = chunk.audio_int16_bytes
